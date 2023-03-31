@@ -1,0 +1,47 @@
+import server from "./server";
+import { useState } from "react";
+
+function Wallet({ address, setAddress, balance, setBalance }) {
+
+  const [newAddress, setNewAddress] = useState("");
+
+  async function getAddressNew(){
+    const {
+      data: { address },
+    } = await server.get(`generate/`);
+    setNewAddress(address); 
+  }
+
+  async function onChange(evt) {
+    const address = evt.target.value;
+    setAddress(address);
+    if (address) {  
+      const {
+        data: { balance },
+      } = await server.get(`balance/${address}`); 
+      setBalance(balance);
+    } else {
+      setBalance(0);
+    }
+  }
+
+  return (
+    <div className="container wallet">
+      <h1>Your Wallet</h1>
+      <label>
+        Generate Adresse
+        <button onClick={getAddressNew}>Click</button>
+        <div className="balance">Public Key:{newAddress.publicKey}</div>
+        <div className="balance">Private Key:{newAddress.privateKey}</div>
+      </label>
+      <label>
+        Wallet Address
+        <input placeholder="Type an address, for example: 0x1" value={address} onChange={onChange}></input>
+      </label>
+
+      <div className="balance">Balance: {balance}</div>
+    </div>
+  );
+}
+
+export default Wallet;
